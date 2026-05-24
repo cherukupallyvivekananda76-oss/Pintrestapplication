@@ -9,6 +9,7 @@ This is the Minimum Viable Product (MVP) for PinAffiliate AI, a web application 
 - **Settings**: Save and manage your Amazon Affiliate tracking tag/store ID.
 - **Generate**: AI-powered generation of Pinterest titles, descriptions, and keywords based on a given niche.
 - **Results**: View generated content, copy it to clipboard, or export as CSV/JSON.
+- **Multi-User Affiliate Support**: Users can safely generate their own affiliate links tied strictly to their account.
 
 ## Tech Stack
 
@@ -55,8 +56,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Implementation Notes
 
+- **Multi-User Affiliate Linking**:
+  - Every logged-in user saves their own tracking ID in the `UserSettings` table.
+  - Generating pins fetches the authenticated user's tag on the server-side, verifying that the user owns the tag.
+  - The link builder strictly uses the authenticated user's tag and no global or hardcoded tags are utilized.
+  - Validation ensures the user provides a structurally valid Amazon Affiliate tracking tag (e.g. `yourname-20`).
 - **Authentication**: For the MVP, `NextAuth` is configured with a simple Credentials Provider. If an email doesn't exist, it will automatically create an account, making it easy to test.
 - **Database**: The app uses an SQLite database (`dev.db`) for immediate out-of-the-box local usage without requiring external cloud databases like Supabase or Postgres setup.
 - **Product Provider**: A modular `ProductProvider` service has been implemented. Currently, it defaults to a `MockProductProvider` which returns realistic sample Amazon products. The codebase is structured so this can be easily swapped for a real Amazon API provider later by updating `src/services/product-provider/index.ts`.
 - **AI Generator**: The app includes a `GeminiAIGenerator`. If no `GEMINI_API_KEY` is provided in the `.env` file, it gracefully falls back to a `MockAIGenerator` that returns realistic Pinterest copy.
-- **Affiliate Links**: The affiliate link builder (`src/utils/affiliate.ts`) is fully functional. It takes the user's saved tag from settings and correctly attaches it to the generated product links.

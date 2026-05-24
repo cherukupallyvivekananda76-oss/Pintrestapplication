@@ -13,6 +13,17 @@ export async function generateContent(formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
 
+  // Load the authenticated user's settings to get their specific affiliate tag
+  const settings = await prisma.userSettings.findUnique({
+    where: { userId: session.user.id }
+  });
+
+  const affiliateTag = settings?.affiliateTag;
+
+  if (!affiliateTag) {
+    throw new Error("You must save your Amazon Affiliate Tag in Settings before generating content.");
+  }
+
   const niche = formData.get("niche") as string;
   const pinCount = parseInt(formData.get("pinCount") as string);
   const audience = formData.get("audience") as string;
@@ -22,7 +33,7 @@ export async function generateContent(formData: FormData) {
     throw new Error("Missing required fields");
   }
 
-  // Create Job
+  // Create Job associated with the specific user
   const job = await prisma.generationJob.create({
     data: {
       userId: session.user.id,
@@ -34,13 +45,6 @@ export async function generateContent(formData: FormData) {
     }
   });
 
-  // Fetch User Settings
-  const settings = await prisma.userSettings.findUnique({
-    where: { userId: session.user.id }
-  });
-
-  const affiliateTag = settings?.affiliateTag;
-
   try {
     // 1. Fetch Products
     const productProvider = getProductProvider();
@@ -50,6 +54,7 @@ export async function generateContent(formData: FormData) {
     const aiGenerator = getAIGenerator();
 
     for (const product of products) {
+      // Use ONLY the authenticated user's tracking ID
       const affiliateUrl = buildAffiliateLink(product.url, affiliateTag);
 
       const pinContent = await aiGenerator.generatePinContent(

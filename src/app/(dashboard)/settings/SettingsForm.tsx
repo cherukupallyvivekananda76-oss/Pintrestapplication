@@ -20,8 +20,8 @@ export function SettingsForm({
       try {
         await action(formData);
         setMessage("Settings saved successfully!");
-      } catch (error) {
-        setMessage("Failed to save settings.");
+      } catch (error: any) {
+        setMessage(error.message || "Failed to save settings.");
       }
     });
   };
@@ -38,6 +38,8 @@ export function SettingsForm({
           name="affiliateTag"
           id="affiliateTag"
           defaultValue={initialData?.affiliateTag || ""}
+          pattern="^[a-zA-Z0-9]+-\d{2}$"
+          title="Amazon Affiliate Tag should look like 'yourname-20'"
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
           placeholder="yourname-20"
         />

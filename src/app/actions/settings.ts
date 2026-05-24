@@ -16,6 +16,12 @@ export async function updateSettings(formData: FormData) {
   const defaultNiche = formData.get("defaultNiche") as string;
   const defaultPinCount = parseInt(formData.get("defaultPinCount") as string) || 5;
 
+  // Validation for Amazon Affiliate Tag
+  // It usually ends in -20 (US) or -21 (UK) etc.
+  if (affiliateTag && !/^[a-zA-Z0-9]+-\d{2}$/.test(affiliateTag)) {
+    throw new Error("Invalid Amazon Affiliate Tag format. It should look like 'yourname-20'.");
+  }
+
   await prisma.userSettings.upsert({
     where: { userId: session.user.id },
     update: {
