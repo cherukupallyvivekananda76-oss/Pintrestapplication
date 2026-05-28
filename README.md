@@ -20,11 +20,14 @@ This is the Minimum Viable Product (MVP) for PinAffiliate AI, a web application 
 
 ## Setup Instructions
 
+Follow these exact steps to run the application locally from a fresh clone. These steps work on Windows (via PowerShell/Command Prompt), macOS, and Linux.
+
 ### 1. Install Dependencies
 
 ```bash
 npm install
 ```
+*Note: This will also automatically run `prisma generate` to create the database client.*
 
 ### 2. Environment Variables
 
@@ -33,18 +36,21 @@ Copy the `.env.example` file to `.env`:
 ```bash
 cp .env.example .env
 ```
+*(On Windows Command Prompt, use `copy .env.example .env`)*
 
-Set the necessary environment variables in `.env`:
-- `NEXTAUTH_SECRET`: A secure random string (you can generate one with `openssl rand -base64 32`)
+Ensure the following variables are present in your `.env` file:
+- `NEXTAUTH_SECRET`: A secure random string. For local testing, you can use any random string like `your-secret-here`.
+- `NEXTAUTH_URL`: Should be set to `http://localhost:3000`.
 - `GEMINI_API_KEY`: (Optional) Your Google Gemini API key. If omitted, the app will use a mock AI generator with realistic sample data.
 
 ### 3. Setup Database
 
-Initialize the SQLite database and run the schema push:
+Initialize the SQLite database and run the migrations to create the necessary tables (including the User table required for login):
 
 ```bash
-npx prisma db push
+npm run setup
 ```
+*(This command is a shortcut for `npx prisma migrate dev`)*
 
 ### 4. Run Development Server
 
@@ -52,7 +58,11 @@ npx prisma db push
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+### 5. Test the Login Flow
+
+1. Open [http://localhost:3000](http://localhost:3000) in your browser.
+2. The app uses auto-signup for the MVP. You can type *any* email and password into the login form.
+3. If the account doesn't exist, it will be automatically created, and you will be logged in.
 
 ## Implementation Notes
 
