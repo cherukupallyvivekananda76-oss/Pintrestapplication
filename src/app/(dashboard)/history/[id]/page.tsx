@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Loader2 } from "lucide-react";
 import { ResultsClient } from "./ResultsClient";
 
 export default async function JobResultsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -31,35 +31,40 @@ export default async function JobResultsPage({ params }: { params: Promise<{ id:
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center space-x-4">
-        <Link href="/history" className="p-2 rounded-full hover:bg-gray-200 text-gray-500">
+    <div className="mx-auto max-w-6xl space-y-8">
+      <div className="flex items-start gap-4">
+        <Link href="/history" className="app-icon-button mt-1 shrink-0" aria-label="Back to history">
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 capitalize">Results: {job.niche}</h1>
-          <p className="text-sm text-gray-500">
+        <div className="app-page-header">
+          <p className="app-eyebrow">Results</p>
+          <h1 className="app-title capitalize">Results: {job.niche}</h1>
+          <p className="app-subtitle">
             Generated {job.products.length} products on {new Date(job.createdAt).toLocaleString()}
           </p>
         </div>
       </div>
 
       {job.status === "processing" && (
-        <div className="p-8 text-center bg-white rounded-lg border shadow-sm">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Generating your content... This might take a minute.</p>
+        <div className="app-card px-6 py-12 text-center">
+          <Loader2 className="mx-auto h-10 w-10 animate-spin text-[var(--accent)]" />
+          <p className="mt-4 text-sm font-semibold text-[var(--muted)]">Generating your content... This might take a minute.</p>
         </div>
       )}
 
       {job.status === "failed_temp" && (
-        <div className="p-8 text-center bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-200">
-          Generation paused due to temporary high demand on the AI service. Please try generating again later.
+        <div className="app-alert app-alert-warning">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+          <p className="text-sm font-semibold">
+            Generation paused due to temporary high demand on the AI service. Please try generating again later.
+          </p>
         </div>
       )}
 
       {job.status === "failed" && (
-        <div className="p-8 text-center bg-red-50 text-red-600 rounded-lg border border-red-200">
-          Generation failed due to an unexpected error. Please try again.
+        <div className="app-alert app-alert-danger">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+          <p className="text-sm font-semibold">Generation failed due to an unexpected error. Please try again.</p>
         </div>
       )}
 

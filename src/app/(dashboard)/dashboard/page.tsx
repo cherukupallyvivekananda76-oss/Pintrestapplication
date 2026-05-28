@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { PlusCircle, Settings as SettingsIcon, History } from "lucide-react";
+import { ArrowRight, History, PlusCircle, Settings as SettingsIcon, Sparkles } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -22,81 +22,114 @@ export default async function DashboardPage() {
   const needsSetup = !settings?.affiliateTag;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-gray-600">Welcome back! Here's an overview of your activity.</p>
+    <div className="mx-auto max-w-6xl space-y-8">
+      <div className="app-page-header">
+        <p className="app-eyebrow">Workspace</p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h1 className="app-title">Dashboard</h1>
+            <p className="app-subtitle mt-3">
+              A focused command center for turning product niches into polished Pinterest affiliate content.
+            </p>
+          </div>
+          <Link href="/generate" className="app-button-primary w-full gap-2 sm:w-auto">
+            <PlusCircle className="h-4 w-4" />
+            New generation
+          </Link>
+        </div>
       </div>
 
       {needsSetup && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <SettingsIcon className="h-5 w-5 text-yellow-400" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700">
-                You haven't set your Amazon Affiliate Tag yet.
-                <Link href="/settings" className="font-medium underline ml-1 hover:text-yellow-600">
-                  Go to Settings to set it up
-                </Link>
-                so your generated links will include your tag.
-              </p>
-            </div>
+        <div className="app-alert app-alert-warning">
+          <SettingsIcon className="mt-0.5 h-5 w-5 shrink-0" />
+          <div>
+            <p className="text-sm font-bold">Affiliate tag needed before generation</p>
+            <p className="mt-1 text-sm leading-6">
+              Add your Amazon Affiliate Tag so generated links include your tracking ID.
+              <Link href="/settings" className="ml-1 font-extrabold underline underline-offset-4">
+                Open settings
+              </Link>
+            </p>
           </div>
         </div>
       )}
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Link href="/generate" className="block p-6 bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center">
-            <PlusCircle className="h-8 w-8 text-blue-600" />
-            <div className="ml-4">
-              <h3 className="text-lg font-medium text-gray-900">New Generation</h3>
-              <p className="text-sm text-gray-500">Create new Pinterest content</p>
-            </div>
+        <Link href="/generate" className="app-card-interactive block p-6">
+          <div className="flex items-start justify-between gap-4">
+            <span className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[var(--accent-soft)] text-[var(--accent)]">
+              <PlusCircle className="h-5 w-5" />
+            </span>
+            <ArrowRight className="h-4 w-4 text-[var(--muted)]" />
+          </div>
+          <div className="mt-6">
+            <h3 className="text-lg font-extrabold text-[var(--foreground)]">New generation</h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Create fresh product picks, pin copy, and keywords.</p>
           </div>
         </Link>
 
-        <Link href="/history" className="block p-6 bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center">
-            <History className="h-8 w-8 text-indigo-600" />
-            <div className="ml-4">
-              <h3 className="text-lg font-medium text-gray-900">View History</h3>
-              <p className="text-sm text-gray-500">See your past generations</p>
-            </div>
+        <Link href="/history" className="app-card-interactive block p-6">
+          <div className="flex items-start justify-between gap-4">
+            <span className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[#ebe7dc] text-[var(--muted-strong)]">
+              <History className="h-5 w-5" />
+            </span>
+            <ArrowRight className="h-4 w-4 text-[var(--muted)]" />
+          </div>
+          <div className="mt-6">
+            <h3 className="text-lg font-extrabold text-[var(--foreground)]">View history</h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Review previous runs and export finished assets.</p>
           </div>
         </Link>
 
-        <Link href="/settings" className="block p-6 bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center">
-            <SettingsIcon className="h-8 w-8 text-gray-600" />
-            <div className="ml-4">
-              <h3 className="text-lg font-medium text-gray-900">Settings</h3>
-              <p className="text-sm text-gray-500">Manage your affiliate tag</p>
-            </div>
+        <Link href="/settings" className="app-card-interactive block p-6">
+          <div className="flex items-start justify-between gap-4">
+            <span className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[#f5e6d3] text-[#8a5114]">
+              <SettingsIcon className="h-5 w-5" />
+            </span>
+            <ArrowRight className="h-4 w-4 text-[var(--muted)]" />
+          </div>
+          <div className="mt-6">
+            <h3 className="text-lg font-extrabold text-[var(--foreground)]">Settings</h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Manage affiliate defaults and generation preferences.</p>
           </div>
         </Link>
       </div>
 
-      <div className="bg-white rounded-lg border shadow-sm">
-        <div className="px-6 py-5 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Recent Generations</h3>
+      <div className="app-card overflow-hidden">
+        <div className="flex flex-col gap-2 border-b border-[var(--border)] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="app-eyebrow">Activity</p>
+            <h3 className="mt-1 text-lg font-extrabold text-[var(--foreground)]">Recent generations</h3>
+          </div>
+          <Link href="/history" className="text-sm font-extrabold text-[var(--accent)] hover:text-[var(--accent-strong)]">
+            See all
+          </Link>
         </div>
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-[var(--border)]">
           {recentJobs.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
-              No generations yet. Click "New Generation" to get started.
+            <div className="px-6 py-12 text-center">
+              <Sparkles className="mx-auto h-8 w-8 text-[var(--accent)]" />
+              <h4 className="mt-4 text-base font-extrabold text-[var(--foreground)]">No generations yet</h4>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
+                Start with a niche, then come back here to compare and export your best content.
+              </p>
+              <Link href="/generate" className="app-button-primary mt-5 gap-2">
+                <PlusCircle className="h-4 w-4" />
+                Create your first run
+              </Link>
             </div>
           ) : (
             recentJobs.map((job) => (
-              <div key={job.id} className="p-6 flex items-center justify-between">
+              <div key={job.id} className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Niche: {job.niche}</p>
-                  <p className="text-sm text-gray-500">{job.pinCount} products • {new Date(job.createdAt).toLocaleDateString()}</p>
+                  <p className="text-sm font-extrabold capitalize text-[var(--foreground)]">Niche: {job.niche}</p>
+                  <p className="mt-1 text-sm text-[var(--muted)]">
+                    {job.pinCount} products • {new Date(job.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
-                <Link href={`/history/${job.id}`} className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                  View Results &rarr;
+                <Link href={`/history/${job.id}`} className="app-button-secondary gap-2 self-start sm:self-auto">
+                  View results
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             ))
