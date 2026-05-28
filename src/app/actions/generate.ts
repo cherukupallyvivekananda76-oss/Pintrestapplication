@@ -76,12 +76,12 @@ export async function generateContent(formData: FormData) {
     for (const product of products) {
       // Defensive validation for image and URL
       if (!product.url || !isValidUrl(product.url)) {
-        console.warn("Skipping product due to invalid URL:", product.url);
+        console.warn(`[Generation Action] Skipping product due to invalid URL: ${product.url}`);
         continue;
       }
 
       if (!product.imageUrl || !isValidUrl(product.imageUrl) || product.imageUrl.includes('picsum.photos')) {
-         console.warn("Skipping product due to invalid or placeholder image:", product.imageUrl);
+         console.warn(`[Generation Action] Skipping product due to invalid or placeholder image: ${product.imageUrl}`);
          continue;
       }
 
@@ -123,12 +123,18 @@ export async function generateContent(formData: FormData) {
     });
 
   } catch (error: any) {
-    console.error("Generation failed:", error);
+    console.error(`[Generation Action] Job ${job.id} failed:`, error);
+
+    const isTransientError = error?.message?.includes('high demand');
+    const finalStatus = isTransientError ? 'failed_temp' : 'failed';
+
     await prisma.generationJob.update({
       where: { id: job.id },
-      data: { status: "failed" }
+      data: { status: finalStatus }
     });
-    throw new Error(error.message || "Failed to generate content");
+
+    // Pass the clean UI-friendly message back to the frontend form
+    throw new Error(error.message || "An unexpected error occurred during generation.");
   }
 
   revalidatePath("/dashboard");

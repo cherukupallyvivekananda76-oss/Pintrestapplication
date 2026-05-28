@@ -51,9 +51,15 @@ export default async function JobResultsPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
+      {job.status === "failed_temp" && (
+        <div className="p-8 text-center bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-200">
+          Generation paused due to temporary high demand on the AI service. Please try generating again later.
+        </div>
+      )}
+
       {job.status === "failed" && (
         <div className="p-8 text-center bg-red-50 text-red-600 rounded-lg border border-red-200">
-          Generation failed. Please try again.
+          Generation failed due to an unexpected error. Please try again.
         </div>
       )}
 
