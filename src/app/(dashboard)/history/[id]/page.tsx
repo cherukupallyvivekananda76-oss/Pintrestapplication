@@ -6,13 +6,19 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ResultsClient } from "./ResultsClient";
 
-export default async function JobResultsPage({ params }: { params: { id: string } }) {
+export default async function JobResultsPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
-  const job = await prisma.generationJob.findUnique({
+  const resolvedParams = await params;
+
+  if (!resolvedParams?.id) {
+    notFound();
+  }
+
+  const job = await prisma.generationJob.findFirst({
     where: {
-      id: params.id,
+      id: resolvedParams.id,
       userId: session.user.id
     },
     include: {
