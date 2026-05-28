@@ -48,29 +48,15 @@ export class GeminiAIGenerator implements AIGenerator {
       return JSON.parse(text) as PinContent;
     } catch (error) {
       console.error("Gemini AI error:", error);
-      throw new Error("Failed to generate AI content");
+      throw new Error("Failed to generate AI content using Gemini");
     }
-  }
-}
-
-export class MockAIGenerator implements AIGenerator {
-  async generatePinContent(product: Product, audience?: string, tone?: string): Promise<PinContent> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    return {
-      title: `Must-Have: ${product.title.substring(0, 40)}...`,
-      description: `Obsessed with this! 😍 If you're looking for the perfect ${audience || 'addition to your home'}, this is it. ${product.features[0] || 'Amazing quality'} and super aesthetic. Save this for later! ✨ #finds #aesthetic #musthave`,
-      keywords: ["aesthetic", "musthave", "finds", "home", "inspiration", tone || "trendy"]
-    };
   }
 }
 
 export const getAIGenerator = (): AIGenerator => {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (apiKey) {
-    return new GeminiAIGenerator(apiKey);
+  if (!apiKey) {
+    throw new Error("Configuration Error: GEMINI_API_KEY is missing in environment variables. Real generation requires this key.");
   }
-  console.warn("No GEMINI_API_KEY found, using mock AI generator");
-  return new MockAIGenerator();
+  return new GeminiAIGenerator(apiKey);
 };

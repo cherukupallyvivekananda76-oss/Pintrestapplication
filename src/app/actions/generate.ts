@@ -9,9 +9,23 @@ import { buildAffiliateLink } from "@/utils/affiliate";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
+function isValidUrl(urlString: string) {
+  try {
+    new URL(urlString);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 export async function generateContent(formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
+
+  // Check required environment variables
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("Configuration Error: GEMINI_API_KEY is missing. AI generation requires this key.");
+  }
 
   // Load the authenticated user's settings to get their specific affiliate tag
   const settings = await prisma.userSettings.findUnique({
@@ -50,10 +64,27 @@ export async function generateContent(formData: FormData) {
     const productProvider = getProductProvider();
     const products = await productProvider.searchProducts(niche, pinCount);
 
+    if (!products || products.length === 0) {
+      throw new Error(`Failed to find real products for niche: ${niche}`);
+    }
+
     // 2. Generate AI Content & Save Products
     const aiGenerator = getAIGenerator();
 
+    let validProductsSaved = 0;
+
     for (const product of products) {
+      // Defensive validation for image and URL
+      if (!product.url || !isValidUrl(product.url)) {
+        console.warn("Skipping product due to invalid URL:", product.url);
+        continue;
+      }
+
+      if (!product.imageUrl || !isValidUrl(product.imageUrl) || product.imageUrl.includes('picsum.photos')) {
+         console.warn("Skipping product due to invalid or placeholder image:", product.imageUrl);
+         continue;
+      }
+
       // Use ONLY the authenticated user's tracking ID
       const affiliateUrl = buildAffiliateLink(product.url, affiliateTag);
 
@@ -78,6 +109,11 @@ export async function generateContent(formData: FormData) {
           keywordsJson: JSON.stringify(pinContent.keywords)
         }
       });
+      validProductsSaved++;
+    }
+
+    if (validProductsSaved === 0) {
+        throw new Error("Failed to process and save any valid products.");
     }
 
     // Mark complete
@@ -86,13 +122,13 @@ export async function generateContent(formData: FormData) {
       data: { status: "completed" }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Generation failed:", error);
     await prisma.generationJob.update({
       where: { id: job.id },
       data: { status: "failed" }
     });
-    throw new Error("Failed to generate content");
+    throw new Error(error.message || "Failed to generate content");
   }
 
   revalidatePath("/dashboard");
