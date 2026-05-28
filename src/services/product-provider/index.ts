@@ -1,8 +1,9 @@
 import { ProductProvider } from "./types";
-import { MockProductProvider } from "./mock-provider";
+import { AmazonScraperProvider } from "./amazon-scraper";
 
-// TODO: Replace with real Amazon provider when API access is available
-// For now, we use the mock provider to ensure the app is fully runnable end-to-end
 export const getProductProvider = (): ProductProvider => {
-  return new MockProductProvider();
+  // Use real scraper instead of mock provider.
+  // In a full production app, this would switch between Amazon PA API, Creators API, etc.
+  // based on environment variables.
+  return new AmazonScraperProvider();
 };
