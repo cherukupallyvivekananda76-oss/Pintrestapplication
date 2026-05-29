@@ -13,6 +13,8 @@ export async function updateSettings(formData: FormData) {
   }
 
   const affiliateTag = formData.get("affiliateTag") as string;
+  const genericAffiliateTag = formData.get("genericAffiliateTag") as string;
+  const preferredPlatforms = formData.get("preferredPlatforms") as string;
   const defaultNiche = formData.get("defaultNiche") as string;
   const defaultPinCount = parseInt(formData.get("defaultPinCount") as string) || 5;
 
@@ -26,12 +28,16 @@ export async function updateSettings(formData: FormData) {
     where: { userId: session.user.id },
     update: {
       affiliateTag: affiliateTag || null,
+      genericAffiliateTag: genericAffiliateTag || null,
+      preferredPlatforms: preferredPlatforms || null,
       defaultNiche: defaultNiche || null,
       defaultPinCount,
     },
     create: {
       userId: session.user.id,
       affiliateTag: affiliateTag || null,
+      genericAffiliateTag: genericAffiliateTag || null,
+      preferredPlatforms: preferredPlatforms || null,
       defaultNiche: defaultNiche || null,
       defaultPinCount,
     }

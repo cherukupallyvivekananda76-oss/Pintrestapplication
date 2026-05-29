@@ -59,6 +59,36 @@ export function SettingsForm({
       </div>
 
       <div>
+        <label htmlFor="genericAffiliateTag" className="app-label">
+          Generic Affiliate Tag / Ref Code
+        </label>
+        <p className="app-help">Used for ShareASale, CJ, ClickBank, and other networks.</p>
+        <input
+          type="text"
+          name="genericAffiliateTag"
+          id="genericAffiliateTag"
+          defaultValue={initialData?.genericAffiliateTag || ""}
+          className="app-input"
+          placeholder="your-ref-code"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="preferredPlatforms" className="app-label">
+          Preferred Platforms
+        </label>
+        <p className="app-help">Comma-separated list (e.g. Amazon, ShareASale)</p>
+        <input
+          type="text"
+          name="preferredPlatforms"
+          id="preferredPlatforms"
+          defaultValue={initialData?.preferredPlatforms || ""}
+          className="app-input"
+          placeholder="Amazon, ShareASale"
+        />
+      </div>
+
+      <div>
         <label htmlFor="defaultNiche" className="app-label">
           Default Niche
         </label>

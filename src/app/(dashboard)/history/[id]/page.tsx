@@ -22,7 +22,11 @@ export default async function JobResultsPage({ params }: { params: Promise<{ id:
       userId: session.user.id
     },
     include: {
-      products: true
+      products: {
+        include: {
+          affiliateLinks: true // Ensure affiliate links are passed to the client
+        }
+      }
     }
   });
 

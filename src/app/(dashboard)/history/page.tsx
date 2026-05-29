@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ArrowRight, Clock, History, PlusCircle } from "lucide-react";
+import { Link as LinkIcon } from "lucide-react";
 
 export default async function HistoryPage() {
   const session = await getServerSession(authOptions);
@@ -14,6 +15,13 @@ export default async function HistoryPage() {
     include: {
       _count: {
         select: { products: true }
+      },
+      products: {
+        include: {
+          _count: {
+            select: { affiliateLinks: true }
+          }
+        }
       }
     }
   });
@@ -49,37 +57,50 @@ export default async function HistoryPage() {
           </div>
         ) : (
           <ul className="divide-y divide-[var(--border)]">
-            {jobs.map((job) => (
-              <li key={job.id}>
-                <Link href={`/history/${job.id}`} className="block hover:bg-[var(--surface-muted)]">
-                  <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-start gap-4">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] bg-[var(--surface-muted)] text-[var(--muted-strong)]">
-                        <Clock className="h-5 w-5" />
-                      </span>
-                      <div>
-                        <p className="text-sm font-extrabold capitalize text-[var(--foreground)]">
-                          {job.niche}
-                        </p>
-                        <p className="mt-1 text-sm text-[var(--muted)]">
-                          {job._count.products} products • {new Date(job.createdAt).toLocaleString()}
-                        </p>
+            {jobs.map((job) => {
+              const hasAffiliateLinks = job.products.some((p) => p._count.affiliateLinks > 0);
+
+              return (
+                <li key={job.id}>
+                  <Link href={`/history/${job.id}`} className="block hover:bg-[var(--surface-muted)]">
+                    <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-start gap-4">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] bg-[var(--surface-muted)] text-[var(--muted-strong)]">
+                          <Clock className="h-5 w-5" />
+                        </span>
+                        <div>
+                          <p className="flex items-center gap-2 text-sm font-extrabold capitalize text-[var(--foreground)]">
+                            {job.niche}
+                            {hasAffiliateLinks && (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--accent)]"
+                                title="Affiliate links generated"
+                              >
+                                <LinkIcon className="h-3 w-3" />
+                                Links
+                              </span>
+                            )}
+                          </p>
+                          <p className="mt-1 text-sm text-[var(--muted)]">
+                            {job._count.products} products • {new Date(job.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 sm:justify-end">
+                        <span className={`app-badge ${
+                          job.status === "completed" ? "bg-[var(--success-soft)] text-[var(--success)]" :
+                          job.status === "failed" ? "bg-[var(--danger-soft)] text-[var(--danger)]" :
+                          "bg-[var(--warning-soft)] text-[var(--warning)]"
+                        }`}>
+                          {job.status}
+                        </span>
+                        <ArrowRight className="h-4 w-4 text-[var(--muted)]" />
                       </div>
                     </div>
-                    <div className="flex items-center justify-between gap-4 sm:justify-end">
-                      <span className={`app-badge ${
-                        job.status === "completed" ? "bg-[var(--success-soft)] text-[var(--success)]" :
-                        job.status === "failed" ? "bg-[var(--danger-soft)] text-[var(--danger)]" :
-                        "bg-[var(--warning-soft)] text-[var(--warning)]"
-                      }`}>
-                        {job.status}
-                      </span>
-                      <ArrowRight className="h-4 w-4 text-[var(--muted)]" />
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
