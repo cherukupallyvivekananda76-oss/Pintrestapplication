@@ -28,53 +28,89 @@ export function SettingsForm({
 
   return (
     <form ref={formRef} action={handleSubmit} className="space-y-6">
-      <div>
-        <label htmlFor="affiliateTag" className="block text-sm font-medium text-gray-700">
-          Amazon Affiliate Tag / Store ID
-        </label>
-        <p className="text-xs text-gray-500 mb-1">Used to build your affiliate links (e.g. yourname-20)</p>
-        <input
-          type="text"
-          name="affiliateTag"
-          id="affiliateTag"
-          defaultValue={initialData?.affiliateTag || ""}
-          pattern="^[a-zA-Z0-9]+-\d{2}$"
-          title="Amazon Affiliate Tag should look like 'yourname-20'"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-          placeholder="yourname-20"
-        />
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Affiliate Configuration</h3>
+        <div>
+          <label htmlFor="affiliateTag" className="block text-sm font-medium text-gray-700">
+            Amazon Affiliate Tag / Store ID
+          </label>
+          <p className="text-xs text-gray-500 mb-1">Used to build your affiliate links (e.g. yourname-20)</p>
+          <input
+            type="text"
+            name="affiliateTag"
+            id="affiliateTag"
+            defaultValue={initialData?.affiliateTag || ""}
+            pattern="^[a-zA-Z0-9]+-\d{2}$"
+            title="Amazon Affiliate Tag should look like 'yourname-20'"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+            placeholder="yourname-20"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="genericAffiliateTag" className="block text-sm font-medium text-gray-700">
+            Generic Affiliate Tag / Ref Code
+          </label>
+          <p className="text-xs text-gray-500 mb-1">Used for ShareASale, CJ, ClickBank, etc.</p>
+          <input
+            type="text"
+            name="genericAffiliateTag"
+            id="genericAffiliateTag"
+            defaultValue={initialData?.genericAffiliateTag || ""}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+            placeholder="your-ref-code"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="preferredPlatforms" className="block text-sm font-medium text-gray-700">
+            Preferred Platforms
+          </label>
+          <p className="text-xs text-gray-500 mb-1">Comma-separated list (e.g. Amazon, ShareASale)</p>
+          <input
+            type="text"
+            name="preferredPlatforms"
+            id="preferredPlatforms"
+            defaultValue={initialData?.preferredPlatforms || ""}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+            placeholder="Amazon, ShareASale"
+          />
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="defaultNiche" className="block text-sm font-medium text-gray-700">
-          Default Niche
-        </label>
-        <input
-          type="text"
-          name="defaultNiche"
-          id="defaultNiche"
-          defaultValue={initialData?.defaultNiche || ""}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-          placeholder="e.g. Home Decor"
-        />
+      <div className="space-y-4 pt-4">
+        <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Generation Defaults</h3>
+        <div>
+          <label htmlFor="defaultNiche" className="block text-sm font-medium text-gray-700">
+            Default Niche
+          </label>
+          <input
+            type="text"
+            name="defaultNiche"
+            id="defaultNiche"
+            defaultValue={initialData?.defaultNiche || ""}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+            placeholder="e.g. Home Decor"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="defaultPinCount" className="block text-sm font-medium text-gray-700">
+            Default Product Count
+          </label>
+          <input
+            type="number"
+            name="defaultPinCount"
+            id="defaultPinCount"
+            min="1"
+            max="20"
+            defaultValue={initialData?.defaultPinCount || 5}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+          />
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="defaultPinCount" className="block text-sm font-medium text-gray-700">
-          Default Product Count
-        </label>
-        <input
-          type="number"
-          name="defaultPinCount"
-          id="defaultPinCount"
-          min="1"
-          max="20"
-          defaultValue={initialData?.defaultPinCount || 5}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-        />
-      </div>
-
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-4">
         <button
           type="submit"
           disabled={isPending}

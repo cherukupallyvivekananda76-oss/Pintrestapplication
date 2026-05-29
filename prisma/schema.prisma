@@ -6,23 +6,24 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  accounts      Account[]
-  sessions      Session[]
-  settings      UserSettings?
-  jobs          GenerationJob[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String          @id @default(cuid())
+  name           String?
+  email          String?         @unique
+  emailVerified  DateTime?
+  image          String?
+  password       String?
+  accounts       Account[]
+  sessions       Session[]
+  settings       UserSettings?
+  jobs           GenerationJob[]
+  affiliateLinks AffiliateLink[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model Account {
@@ -61,13 +62,15 @@ model VerificationToken {
 }
 
 model UserSettings {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  affiliateTag    String?
-  defaultNiche    String?
-  defaultPinCount Int      @default(5)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  affiliateTag       String?
+  genericAffiliateTag String?
+  preferredPlatforms String?  // Store as comma-separated or JSON
+  defaultNiche       String?
+  defaultPinCount    Int      @default(5)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -104,4 +107,21 @@ model GeneratedProduct {
   updatedAt           DateTime @updatedAt
 
   job GenerationJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  affiliateLinks AffiliateLink[]
+}
+
+model AffiliateLink {
+  id           String   @id @default(cuid())
+  userId       String
+  pinId        String?  // maps to GeneratedProduct.id
+  productName  String
+  productUrl   String
+  affiliateUrl String
+  platform     String
+  niche        String
+  clicks       Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pin  GeneratedProduct? @relation(fields: [pinId], references: [id], onDelete: SetNull)
 }
