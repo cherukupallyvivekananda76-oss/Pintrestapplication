@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowRight, CheckCircle2, Loader2, LockKeyhole, Pin } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,7 +30,7 @@ export default function LoginPage() {
         router.push("/dashboard");
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred");
     } finally {
       setLoading(false);
@@ -37,63 +38,118 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or create a new one (auto-signup enabled for MVP)
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-
+    <main className="app-shell flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
+      <div className="grid w-full max-w-6xl overflow-hidden rounded-[24px] border border-[var(--border)] bg-[color:rgb(255_253_250_/_0.78)] shadow-[var(--shadow-soft)] backdrop-blur-xl lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="hidden border-r border-[var(--border)] bg-[var(--surface)] p-10 lg:flex lg:flex-col lg:justify-between">
           <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              {loading ? "Signing in..." : "Sign in / Sign up"}
-            </button>
+            <div className="flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[var(--accent)] text-white shadow-[0_10px_22px_rgb(15_118_110_/_22%)]">
+                <Pin className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-lg font-extrabold text-[var(--foreground)]">PinAffiliate AI</p>
+                <p className="text-sm font-semibold text-[var(--muted)]">Pinterest affiliate studio</p>
+              </div>
+            </div>
+            <div className="mt-20 max-w-lg">
+              <p className="app-eyebrow">Demo workspace</p>
+              <h1 className="mt-4 text-5xl font-black leading-[1.02] tracking-normal text-[var(--foreground)]">
+                Turn product niches into judge-ready pin campaigns.
+              </h1>
+              <p className="mt-5 text-base leading-8 text-[var(--muted)]">
+                Generate product-backed Pinterest titles, descriptions, hashtags, affiliate links, and exports from a clean command center.
+              </p>
+            </div>
           </div>
-        </form>
+
+          <div className="grid gap-3 text-sm font-semibold text-[var(--muted-strong)]">
+            {["Auto-signup remains enabled", "Affiliate-ready exports", "Fast MVP-friendly workflow"].map((item) => (
+              <div key={item} className="flex items-center gap-3">
+                <CheckCircle2 className="h-4 w-4 text-[var(--accent)]" />
+                {item}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="px-5 py-8 sm:px-10 sm:py-12">
+          <div className="mx-auto max-w-md">
+            <div className="mb-10 lg:hidden">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[var(--accent)] text-white">
+                  <Pin className="h-5 w-5" />
+                </span>
+                <span className="text-lg font-extrabold text-[var(--foreground)]">PinAffiliate AI</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-[14px] bg-[var(--accent-soft)] text-[var(--accent)]">
+                <LockKeyhole className="h-5 w-5" />
+              </div>
+              <p className="app-eyebrow">Welcome back</p>
+              <h2 className="mt-3 text-3xl font-black tracking-normal text-[var(--foreground)]">
+                Sign in to continue
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+                New users are created automatically for this MVP when valid credentials are submitted.
+              </p>
+            </div>
+
+            <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+              <div>
+                <label htmlFor="email-address" className="app-label">
+                  Email address
+                </label>
+                <input
+                  id="email-address"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="app-input"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="app-label">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  className="app-input"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              {error && <div className="app-alert app-alert-danger text-sm font-semibold">{error}</div>}
+
+              <button type="submit" disabled={loading} className="app-button-primary w-full gap-2">
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Sign in / Sign up
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

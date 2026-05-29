@@ -2,6 +2,7 @@
 
 import { useTransition, useState } from "react";
 import { generateContent } from "@/app/actions/generate";
+import { AlertCircle, Loader2, Sparkles } from "lucide-react";
 
 export function GenerateForm({ defaultNiche, defaultPinCount }: { defaultNiche?: string, defaultPinCount?: number }) {
   const [isPending, startTransition] = useTransition();
@@ -12,21 +13,39 @@ export function GenerateForm({ defaultNiche, defaultPinCount }: { defaultNiche?:
     startTransition(async () => {
       try {
         await generateContent(formData);
-      } catch (err: any) {
-        if (err.message !== "NEXT_REDIRECT") {
-          setError(err.message || "An error occurred");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "An error occurred";
+        if (message !== "NEXT_REDIRECT") {
+          setError(message);
         }
       }
     });
   };
 
   return (
-    <form action={handleSubmit} className="space-y-6 max-w-2xl bg-white p-6 rounded-lg border shadow-sm">
-      {error && <div className="text-red-500 text-sm bg-red-50 p-3 rounded">{error}</div>}
+    <form action={handleSubmit} className="app-card max-w-3xl space-y-6 p-5 sm:p-7">
+      <div className="flex items-start gap-4 border-b border-[var(--border)] pb-6">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[var(--accent-soft)] text-[var(--accent)]">
+          <Sparkles className="h-5 w-5" />
+        </span>
+        <div>
+          <h2 className="text-xl font-extrabold text-[var(--foreground)]">Campaign inputs</h2>
+          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+            Keep the niche specific for better product discovery and sharper Pinterest copy.
+          </p>
+        </div>
+      </div>
+
+      {error && (
+        <div className="app-alert app-alert-danger text-sm font-semibold">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          {error}
+        </div>
+      )}
 
       <div>
-        <label htmlFor="niche" className="block text-sm font-medium text-gray-700">
-          Niche / Keyword <span className="text-red-500">*</span>
+        <label htmlFor="niche" className="app-label">
+          Niche / Keyword <span className="text-[var(--danger)]">*</span>
         </label>
         <input
           type="text"
@@ -35,63 +54,71 @@ export function GenerateForm({ defaultNiche, defaultPinCount }: { defaultNiche?:
           required
           defaultValue={defaultNiche || ""}
           placeholder="e.g. Minimalist Desk Setup"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+          className="app-input"
         />
       </div>
 
-      <div>
-        <label htmlFor="pinCount" className="block text-sm font-medium text-gray-700">
-          Number of Products/Pins <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="number"
-          name="pinCount"
-          id="pinCount"
-          required
-          min="1"
-          max="20"
-          defaultValue={defaultPinCount || 5}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-        />
+      <div className="grid gap-6 sm:grid-cols-2">
+        <div>
+          <label htmlFor="pinCount" className="app-label">
+            Number of Products/Pins <span className="text-[var(--danger)]">*</span>
+          </label>
+          <input
+            type="number"
+            name="pinCount"
+            id="pinCount"
+            required
+            min="1"
+            max="20"
+            defaultValue={defaultPinCount || 5}
+            className="app-input"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="tone" className="app-label">
+            Tone (Optional)
+          </label>
+          <select name="tone" id="tone" className="app-select">
+            <option value="">Default (Natural)</option>
+            <option value="enthusiastic">Enthusiastic</option>
+            <option value="professional">Professional</option>
+            <option value="aesthetic">Aesthetic / Trendy</option>
+            <option value="urgent">Urgent / Salesy</option>
+          </select>
+        </div>
       </div>
 
       <div>
-        <label htmlFor="audience" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="audience" className="app-label">
           Target Audience (Optional)
         </label>
         <input
           type="text"
           name="audience"
           id="audience"
-          placeholder="e.g. College students, Work from home professionals"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+          placeholder="e.g. College students, work-from-home professionals"
+          className="app-input"
         />
       </div>
 
-      <div>
-        <label htmlFor="tone" className="block text-sm font-medium text-gray-700">
-          Tone (Optional)
-        </label>
-        <select
-          name="tone"
-          id="tone"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border bg-white"
-        >
-          <option value="">Default (Natural)</option>
-          <option value="enthusiastic">Enthusiastic</option>
-          <option value="professional">Professional</option>
-          <option value="aesthetic">Aesthetic / Trendy</option>
-          <option value="urgent">Urgent / Salesy</option>
-        </select>
-      </div>
-
-      <div className="pt-4 border-t">
+      <div className="border-t border-[var(--border)] pt-4">
         <button
           type="submit"
           disabled={isPending}
-          className="w-full flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          className="app-button-primary w-full gap-2"
         >
-          {isPending ? "Generating Content..." : "Generate Pins"}
+          {isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Generating content...
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-4 w-4" />
+              Generate pins
+            </>
+          )}
         </button>
       </div>
     </form>

@@ -2,6 +2,7 @@
 
 import { useTransition, useRef, useState } from "react";
 import { UserSettings } from "@prisma/client";
+import { CheckCircle2, Loader2, Save, Settings2 } from "lucide-react";
 
 export function SettingsForm({
   initialData,
@@ -20,106 +21,127 @@ export function SettingsForm({
       try {
         await action(formData);
         setMessage("Settings saved successfully!");
-      } catch (error: any) {
-        setMessage(error.message || "Failed to save settings.");
+      } catch (error: unknown) {
+        setMessage(error instanceof Error ? error.message : "Failed to save settings.");
       }
     });
   };
 
   return (
     <form ref={formRef} action={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Affiliate Configuration</h3>
+      <div className="flex items-start gap-4 border-b border-[var(--border)] pb-6">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[var(--accent-soft)] text-[var(--accent)]">
+          <Settings2 className="h-5 w-5" />
+        </span>
         <div>
-          <label htmlFor="affiliateTag" className="block text-sm font-medium text-gray-700">
-            Amazon Affiliate Tag / Store ID
-          </label>
-          <p className="text-xs text-gray-500 mb-1">Used to build your affiliate links (e.g. yourname-20)</p>
-          <input
-            type="text"
-            name="affiliateTag"
-            id="affiliateTag"
-            defaultValue={initialData?.affiliateTag || ""}
-            pattern="^[a-zA-Z0-9]+-\d{2}$"
-            title="Amazon Affiliate Tag should look like 'yourname-20'"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-            placeholder="yourname-20"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="genericAffiliateTag" className="block text-sm font-medium text-gray-700">
-            Generic Affiliate Tag / Ref Code
-          </label>
-          <p className="text-xs text-gray-500 mb-1">Used for ShareASale, CJ, ClickBank, etc.</p>
-          <input
-            type="text"
-            name="genericAffiliateTag"
-            id="genericAffiliateTag"
-            defaultValue={initialData?.genericAffiliateTag || ""}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-            placeholder="your-ref-code"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="preferredPlatforms" className="block text-sm font-medium text-gray-700">
-            Preferred Platforms
-          </label>
-          <p className="text-xs text-gray-500 mb-1">Comma-separated list (e.g. Amazon, ShareASale)</p>
-          <input
-            type="text"
-            name="preferredPlatforms"
-            id="preferredPlatforms"
-            defaultValue={initialData?.preferredPlatforms || ""}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-            placeholder="Amazon, ShareASale"
-          />
+          <h2 className="text-xl font-extrabold text-[var(--foreground)]">Affiliate defaults</h2>
+          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+            These values prefill generation and keep exported links consistent.
+          </p>
         </div>
       </div>
 
-      <div className="space-y-4 pt-4">
-        <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Generation Defaults</h3>
-        <div>
-          <label htmlFor="defaultNiche" className="block text-sm font-medium text-gray-700">
-            Default Niche
-          </label>
-          <input
-            type="text"
-            name="defaultNiche"
-            id="defaultNiche"
-            defaultValue={initialData?.defaultNiche || ""}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-            placeholder="e.g. Home Decor"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="defaultPinCount" className="block text-sm font-medium text-gray-700">
-            Default Product Count
-          </label>
-          <input
-            type="number"
-            name="defaultPinCount"
-            id="defaultPinCount"
-            min="1"
-            max="20"
-            defaultValue={initialData?.defaultPinCount || 5}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-          />
-        </div>
+      <div>
+        <label htmlFor="affiliateTag" className="app-label">
+          Amazon Affiliate Tag / Store ID
+        </label>
+        <p className="app-help">Used to build your affiliate links (e.g. yourname-20)</p>
+        <input
+          type="text"
+          name="affiliateTag"
+          id="affiliateTag"
+          defaultValue={initialData?.affiliateTag || ""}
+          pattern="^[a-zA-Z0-9]+-\d{2}$"
+          title="Amazon Affiliate Tag should look like 'yourname-20'"
+          className="app-input"
+          placeholder="yourname-20"
+        />
       </div>
 
-      <div className="flex items-center justify-between pt-4">
+      <div>
+        <label htmlFor="genericAffiliateTag" className="app-label">
+          Generic Affiliate Tag / Ref Code
+        </label>
+        <p className="app-help">Used for ShareASale, CJ, ClickBank, and other networks.</p>
+        <input
+          type="text"
+          name="genericAffiliateTag"
+          id="genericAffiliateTag"
+          defaultValue={initialData?.genericAffiliateTag || ""}
+          className="app-input"
+          placeholder="your-ref-code"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="preferredPlatforms" className="app-label">
+          Preferred Platforms
+        </label>
+        <p className="app-help">Comma-separated list (e.g. Amazon, ShareASale)</p>
+        <input
+          type="text"
+          name="preferredPlatforms"
+          id="preferredPlatforms"
+          defaultValue={initialData?.preferredPlatforms || ""}
+          className="app-input"
+          placeholder="Amazon, ShareASale"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="defaultNiche" className="app-label">
+          Default Niche
+        </label>
+        <input
+          type="text"
+          name="defaultNiche"
+          id="defaultNiche"
+          defaultValue={initialData?.defaultNiche || ""}
+          className="app-input"
+          placeholder="e.g. Home Decor"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="defaultPinCount" className="app-label">
+          Default Product Count
+        </label>
+        <input
+          type="number"
+          name="defaultPinCount"
+          id="defaultPinCount"
+          min="1"
+          max="20"
+          defaultValue={initialData?.defaultPinCount || 5}
+          className="app-input"
+        />
+      </div>
+
+      <div className="flex flex-col gap-4 border-t border-[var(--border)] pt-5 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          className="app-button-primary gap-2"
         >
-          {isPending ? "Saving..." : "Save Settings"}
+          {isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              Save settings
+            </>
+          )}
         </button>
         {message && (
-          <span className={`text-sm ${message.includes("success") ? "text-green-600" : "text-red-600"}`}>
+          <span
+            className={`inline-flex items-center gap-2 text-sm font-bold ${
+              message.includes("success") ? "text-[var(--success)]" : "text-[var(--danger)]"
+            }`}
+          >
+            {message.includes("success") && <CheckCircle2 className="h-4 w-4" />}
             {message}
           </span>
         )}
