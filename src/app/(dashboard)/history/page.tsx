@@ -2,8 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ArrowRight, Clock, History, PlusCircle } from "lucide-react";
-import { Link as LinkIcon } from "lucide-react";
+import { Clock, Link as LinkIcon } from "lucide-react";
 
 export default async function HistoryPage() {
   const session = await getServerSession(authOptions);
@@ -27,74 +26,50 @@ export default async function HistoryPage() {
   });
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
-      <div className="app-page-header">
-        <p className="app-eyebrow">Archive</p>
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h1 className="app-title">Generation history</h1>
-            <p className="app-subtitle mt-3">View past generations, inspect outputs, and export finished content.</p>
-          </div>
-          <Link href="/generate" className="app-button-primary w-full gap-2 sm:w-auto">
-            <PlusCircle className="h-4 w-4" />
-            New generation
-          </Link>
-        </div>
+    <div className="max-w-5xl mx-auto space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Generation History</h1>
+        <p className="mt-2 text-gray-600">View your past generations and export content.</p>
       </div>
 
-      <div className="app-card overflow-hidden">
+      <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
         {jobs.length === 0 ? (
-          <div className="px-6 py-14 text-center">
-            <History className="mx-auto h-9 w-9 text-[var(--accent)]" />
-            <h2 className="mt-4 text-lg font-extrabold text-[var(--foreground)]">No history yet</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-              Your completed generations will appear here with status, product counts, and exportable results.
-            </p>
-            <Link href="/generate" className="app-button-primary mt-5 gap-2">
-              <PlusCircle className="h-4 w-4" />
-              Create pins
-            </Link>
+          <div className="p-8 text-center text-gray-500">
+            No history yet. Go to <Link href="/generate" className="text-blue-600 hover:underline">Generate</Link> to create some pins!
           </div>
         ) : (
-          <ul className="divide-y divide-[var(--border)]">
+          <ul className="divide-y divide-gray-200">
             {jobs.map((job) => {
-              const hasAffiliateLinks = job.products.some((p) => p._count.affiliateLinks > 0);
+              const hasAffiliateLinks = job.products.some(p => p._count.affiliateLinks > 0);
 
               return (
                 <li key={job.id}>
-                  <Link href={`/history/${job.id}`} className="block hover:bg-[var(--surface-muted)]">
-                    <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-start gap-4">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] bg-[var(--surface-muted)] text-[var(--muted-strong)]">
-                          <Clock className="h-5 w-5" />
-                        </span>
+                  <Link href={`/history/${job.id}`} className="block hover:bg-gray-50">
+                    <div className="px-6 py-4 flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Clock className="h-5 w-5 text-gray-400 mr-3" />
                         <div>
-                          <p className="flex items-center gap-2 text-sm font-extrabold capitalize text-[var(--foreground)]">
+                          <p className="text-sm font-medium text-gray-900 capitalize flex items-center gap-2">
                             {job.niche}
                             {hasAffiliateLinks && (
-                              <span
-                                className="inline-flex items-center gap-1 rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--accent)]"
-                                title="Affiliate links generated"
-                              >
-                                <LinkIcon className="h-3 w-3" />
-                                Links
-                              </span>
+                               <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800" title="Affiliate link generated">
+                                 <LinkIcon className="w-3 h-3 mr-1"/> Links
+                               </span>
                             )}
                           </p>
-                          <p className="mt-1 text-sm text-[var(--muted)]">
+                          <p className="text-sm text-gray-500">
                             {job._count.products} products • {new Date(job.createdAt).toLocaleString()}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between gap-4 sm:justify-end">
-                        <span className={`app-badge ${
-                          job.status === "completed" ? "bg-[var(--success-soft)] text-[var(--success)]" :
-                          job.status === "failed" ? "bg-[var(--danger-soft)] text-[var(--danger)]" :
-                          "bg-[var(--warning-soft)] text-[var(--warning)]"
+                      <div>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          job.status === "completed" ? "bg-green-100 text-green-800" :
+                          job.status === "failed" ? "bg-red-100 text-red-800" :
+                          "bg-yellow-100 text-yellow-800"
                         }`}>
                           {job.status}
                         </span>
-                        <ArrowRight className="h-4 w-4 text-[var(--muted)]" />
                       </div>
                     </div>
                   </Link>
