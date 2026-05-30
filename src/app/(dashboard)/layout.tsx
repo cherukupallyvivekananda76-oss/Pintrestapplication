@@ -15,10 +15,10 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="app-shell flex min-h-screen flex-col overflow-hidden md:flex-row">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
-        <div className="app-page w-full px-4 py-6 sm:px-6 lg:px-10 lg:py-10">{children}</div>
+        <div className="p-8">{children}</div>
       </main>
     </div>
   );

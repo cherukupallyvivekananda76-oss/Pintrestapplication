@@ -110,27 +110,27 @@ export function ResultsClient({ products, niche }: { products: GeneratedProductW
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+      <div className="flex justify-end space-x-4">
         <button
           onClick={exportCsv}
-          className="app-button-secondary gap-2"
+          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          <Download className="h-4 w-4" />
+          <Download className="mr-2 h-4 w-4" />
           Export CSV
         </button>
         <button
           onClick={exportJson}
-          className="app-button-secondary gap-2"
+          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          <Download className="h-4 w-4" />
+          <Download className="mr-2 h-4 w-4" />
           Export JSON
         </button>
       </div>
 
       <div className="grid gap-6">
         {localProducts.map((product) => (
-          <article key={product.id} className="app-card overflow-hidden md:grid md:grid-cols-[17rem_1fr]">
-            <div className="relative aspect-[4/3] bg-[var(--surface-muted)] md:aspect-auto md:min-h-72">
+          <div key={product.id} className="bg-white border rounded-lg shadow-sm overflow-hidden flex flex-col md:flex-row">
+            <div className="w-full md:w-64 h-64 bg-gray-100 relative flex-shrink-0">
               <Image
                 src={product.imageUrl}
                 alt={product.productTitle}
@@ -140,46 +140,40 @@ export function ResultsClient({ products, niche }: { products: GeneratedProductW
               />
             </div>
 
-            <div className="flex flex-col p-5 sm:p-6">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="app-eyebrow">Pin package</p>
-                  <h3 className="mt-2 text-2xl font-black leading-tight text-[var(--foreground)]">{product.generatedPinTitle}</h3>
-                  <p className="mt-2 text-sm font-semibold text-[var(--muted)] line-clamp-2">{product.productTitle}</p>
-                </div>
+            <div className="p-6 flex-1 flex flex-col">
+              <div className="flex justify-between items-start">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{product.generatedPinTitle}</h3>
                 <a
                   href={product.affiliateUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="app-button-secondary shrink-0 gap-2"
+                  className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
                 >
-                  View product
-                  <ExternalLink className="h-4 w-4" />
+                  View Product <ExternalLink className="ml-1 h-3 w-3" />
                 </a>
               </div>
 
-              <p className="mt-5 flex-1 whitespace-pre-wrap text-sm leading-7 text-[var(--muted-strong)]">
-                {product.generatedDescription}
-              </p>
+              <p className="text-gray-700 mb-4 flex-1 whitespace-pre-wrap">{product.generatedDescription}</p>
 
-              <div className="mt-5">
-                <div className="flex flex-wrap gap-2.5">
+              <div className="mb-4">
+                <div className="flex flex-wrap gap-2">
                   {JSON.parse(product.keywordsJson || '[]').map((kw: string, i: number) => (
-                    <span key={i} className="app-badge bg-[var(--accent-soft)] text-[var(--accent-strong)]">
+                    <span key={i} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       #{kw}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="mb-4 mt-6 border-t border-[var(--border)] pt-5">
-                <h4 className="mb-2 flex items-center text-sm font-bold text-[var(--foreground)]">
-                  <LinkIcon className="mr-1 h-4 w-4 text-[var(--muted)]" />
+              {/* Affiliate Link Generation Section */}
+              <div className="mb-4 pt-4 border-t border-gray-100">
+                <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                  <LinkIcon className="w-4 h-4 mr-1 text-gray-500"/>
                   Generate Additional Affiliate Link
                 </h4>
                 <form
                   onSubmit={(e) => handleGenerateAffiliate(e, product.id)}
-                  className="flex items-end gap-2"
+                  className="flex gap-2 items-end"
                 >
                   <div className="flex-1">
                     <input type="hidden" name="productName" value={product.productTitle} />
@@ -188,14 +182,14 @@ export function ResultsClient({ products, niche }: { products: GeneratedProductW
                       name="productUrl"
                       required
                       placeholder="https://..."
-                      className="app-input text-sm"
+                      className="block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
                     />
                   </div>
                   <div className="w-32">
                     <select
                       name="platform"
                       required
-                      className="app-input bg-white text-sm"
+                      className="block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white"
                     >
                       <option value="Amazon">Amazon</option>
                       <option value="ShareASale">ShareASale</option>
@@ -207,26 +201,27 @@ export function ResultsClient({ products, niche }: { products: GeneratedProductW
                   <button
                     type="submit"
                     disabled={generatingFor === product.id}
-                    className="app-button-primary px-3 py-2"
+                    className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </form>
 
+                {/* Display Custom Generated Links */}
                 {product.affiliateLinks && product.affiliateLinks.length > 0 && (
                   <div className="mt-3 space-y-2">
-                    {product.affiliateLinks.map((link) => (
-                      <div key={link.id} className="flex items-center justify-between rounded bg-[var(--surface-muted)] p-2 text-sm">
-                        <span className="font-medium text-[var(--muted-strong)]">{link.platform}:</span>
+                    {product.affiliateLinks.map(link => (
+                      <div key={link.id} className="flex items-center justify-between bg-gray-50 p-2 rounded text-sm">
+                        <span className="font-medium text-gray-700">{link.platform}:</span>
                         <div className="flex items-center gap-2 flex-1 mx-2 overflow-hidden">
-                          <span className="truncate text-[var(--accent)]">{link.affiliateUrl}</span>
+                           <span className="truncate text-blue-600">{link.affiliateUrl}</span>
                         </div>
                         <button
                           onClick={() => copyToClipboard(link.affiliateUrl, link.id)}
-                          className="p-1 text-[var(--muted)] hover:text-[var(--foreground)]"
+                          className="text-gray-500 hover:text-gray-700 p-1"
                           title="Copy Link"
                         >
-                          {copiedId === link.id ? <Check className="h-4 w-4 text-[var(--success)]" /> : <Copy className="h-4 w-4" />}
+                           {copiedId === link.id ? <Check className="w-4 h-4 text-green-500"/> : <Copy className="w-4 h-4"/>}
                         </button>
                       </div>
                     ))}
@@ -234,9 +229,9 @@ export function ResultsClient({ products, niche }: { products: GeneratedProductW
                 )}
               </div>
 
-              <div className="mt-6 flex flex-col gap-4 border-t border-[var(--border)] pt-5 lg:flex-row lg:items-center lg:justify-between">
-                <span className="break-all text-xs font-semibold leading-5 text-[var(--muted)]">
-                  Affiliate Link: {product.affiliateUrl.substring(0, 40)}...
+              <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                <span className="text-xs text-gray-500 truncate mr-2" title={product.affiliateUrl}>
+                  Auto Link: {product.affiliateUrl.substring(0, 40)}...
                 </span>
 
                 <button
@@ -244,17 +239,17 @@ export function ResultsClient({ products, niche }: { products: GeneratedProductW
                     const contentToCopy = `${product.generatedPinTitle}\n\n${product.generatedDescription}\n\n${JSON.parse(product.keywordsJson || '[]').map((k: string) => `#${k}`).join(' ')}\n\nGet it here: ${product.affiliateUrl}`;
                     copyToClipboard(contentToCopy, product.id + '_main');
                   }}
-                  className="app-button-primary gap-2"
+                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 whitespace-nowrap"
                 >
                   {copiedId === product.id + '_main' ? (
-                    <><Check className="h-4 w-4" /> Copied!</>
+                    <><Check className="mr-1.5 h-4 w-4 text-green-500" /> Copied!</>
                   ) : (
-                    <><Copy className="h-4 w-4" /> Copy pin package</>
+                    <><Copy className="mr-1.5 h-4 w-4 text-gray-400" /> Copy Pin Package</>
                   )}
                 </button>
               </div>
             </div>
-          </article>
+          </div>
         ))}
       </div>
     </div>
