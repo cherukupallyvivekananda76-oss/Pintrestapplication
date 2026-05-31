@@ -1,9 +1,10 @@
 "use client";
 
-import { GeneratedProduct } from "@prisma/client";
-import { Download, Copy, Check, ExternalLink, Link as LinkIcon, Plus } from "lucide-react";
+import { GeneratedProduct, UserSettings } from "@prisma/client";
+import { Download, Copy, Check, ExternalLink, Link as LinkIcon, Plus, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 type GeneratedProductWithLinks = GeneratedProduct & {
   affiliateLinks?: {
@@ -13,7 +14,15 @@ type GeneratedProductWithLinks = GeneratedProduct & {
   }[];
 };
 
-export function ResultsClient({ products, niche }: { products: GeneratedProductWithLinks[], niche: string }) {
+export function ResultsClient({
+  products,
+  niche,
+  settings
+}: {
+  products: GeneratedProductWithLinks[],
+  niche: string,
+  settings: UserSettings | null
+}) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [generatingFor, setGeneratingFor] = useState<string | null>(null);
   const [localProducts, setLocalProducts] = useState<GeneratedProductWithLinks[]>(products);
@@ -60,14 +69,12 @@ export function ResultsClient({ products, niche }: { products: GeneratedProductW
     document.body.removeChild(link);
   };
 
-  const handleGenerateAffiliate = async (e: React.FormEvent, productId: string) => {
+  const handleGenerateAffiliate = async (e: React.FormEvent, productId: string, productUrl: string, productName: string) => {
     e.preventDefault();
     setGeneratingFor(productId);
 
     const formData = new FormData(e.target as HTMLFormElement);
-    const productUrl = formData.get('productUrl') as string;
     const platform = formData.get('platform') as string;
-    const productName = formData.get('productName') as string;
 
     try {
       const res = await fetch('/api/affiliate/generate', {
@@ -107,6 +114,8 @@ export function ResultsClient({ products, niche }: { products: GeneratedProductW
       setGeneratingFor(null);
     }
   };
+
+  const hasAnyTag = settings?.affiliateTag || settings?.genericAffiliateTag;
 
   return (
     <div className="space-y-6">
@@ -169,59 +178,73 @@ export function ResultsClient({ products, niche }: { products: GeneratedProductW
               <div className="mb-4 pt-4 border-t border-gray-100">
                 <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
                   <LinkIcon className="w-4 h-4 mr-1 text-gray-500"/>
-                  Generate Additional Affiliate Link
+                  Generate Platform Affiliate Link
                 </h4>
-                <form
-                  onSubmit={(e) => handleGenerateAffiliate(e, product.id)}
-                  className="flex gap-2 items-end"
-                >
-                  <div className="flex-1">
-                    <input type="hidden" name="productName" value={product.productTitle} />
-                    <input
-                      type="url"
-                      name="productUrl"
-                      required
-                      placeholder="https://..."
-                      className="block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
-                    />
+
+                {!hasAnyTag ? (
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded-md mb-3">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <AlertCircle className="h-5 w-5 text-yellow-400" />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-yellow-700">
+                          No affiliate tags found.
+                          <Link href="/settings" className="font-medium underline ml-1 hover:text-yellow-600">
+                            Add tags in Settings
+                          </Link>
+                          {" "}to automatically generate trackable links for this product.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="w-32">
-                    <select
-                      name="platform"
-                      required
-                      className="block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white"
-                    >
-                      <option value="Amazon">Amazon</option>
-                      <option value="ShareASale">ShareASale</option>
-                      <option value="ClickBank">ClickBank</option>
-                      <option value="CJ">CJ Affiliate</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={generatingFor === product.id}
-                    className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                ) : (
+                  <form
+                    onSubmit={(e) => handleGenerateAffiliate(e, product.id, product.productUrl, product.productTitle)}
+                    className="flex gap-2 items-end"
                   >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </form>
+                    <div className="flex-1">
+                      <select
+                        name="platform"
+                        required
+                        className="block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white"
+                      >
+                        <option value="Amazon">Amazon</option>
+                        <option value="ShareASale">ShareASale</option>
+                        <option value="ClickBank">ClickBank</option>
+                        <option value="CJ">CJ Affiliate</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={generatingFor === product.id}
+                      className="inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 min-w-[120px]"
+                    >
+                      {generatingFor === product.id ? "Generating..." : "Generate Link"}
+                    </button>
+                  </form>
+                )}
 
                 {/* Display Custom Generated Links */}
                 {product.affiliateLinks && product.affiliateLinks.length > 0 && (
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-4 space-y-2">
                     {product.affiliateLinks.map(link => (
-                      <div key={link.id} className="flex items-center justify-between bg-gray-50 p-2 rounded text-sm">
-                        <span className="font-medium text-gray-700">{link.platform}:</span>
+                      <div key={link.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-md border border-gray-200 text-sm">
+                        <span className="font-medium text-gray-700 w-24 flex-shrink-0">{link.platform}:</span>
                         <div className="flex items-center gap-2 flex-1 mx-2 overflow-hidden">
-                           <span className="truncate text-blue-600">{link.affiliateUrl}</span>
+                           <span className="truncate text-blue-600 font-mono text-xs">{link.affiliateUrl}</span>
                         </div>
                         <button
                           onClick={() => copyToClipboard(link.affiliateUrl, link.id)}
-                          className="text-gray-500 hover:text-gray-700 p-1"
+                          className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 flex-shrink-0"
                           title="Copy Link"
                         >
-                           {copiedId === link.id ? <Check className="w-4 h-4 text-green-500"/> : <Copy className="w-4 h-4"/>}
+                           {copiedId === link.id ? (
+                             <><Check className="mr-1.5 h-3 w-3 text-green-500" /> Copied</>
+                           ) : (
+                             <><Copy className="mr-1.5 h-3 w-3 text-gray-400" /> Copy</>
+                           )}
                         </button>
                       </div>
                     ))}

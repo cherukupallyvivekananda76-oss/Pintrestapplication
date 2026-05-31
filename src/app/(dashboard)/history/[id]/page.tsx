@@ -34,6 +34,10 @@ export default async function JobResultsPage({ params }: { params: Promise<{ id:
     notFound();
   }
 
+  const userSettings = await prisma.userSettings.findUnique({
+    where: { userId: session.user.id }
+  });
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center space-x-4">
@@ -68,7 +72,7 @@ export default async function JobResultsPage({ params }: { params: Promise<{ id:
       )}
 
       {job.status === "completed" && (
-        <ResultsClient products={job.products} niche={job.niche} />
+        <ResultsClient products={job.products} niche={job.niche} settings={userSettings} />
       )}
     </div>
   );
